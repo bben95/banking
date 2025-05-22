@@ -1,12 +1,36 @@
+import HeaderBox from "@/components/HeaderBox";
+import RightSidebar from "@/components/RightSidebar";
+import TotalBalanceBox from "@/components/TotalBalanceBox";
+import { log } from "console";
+
 export default function Home() {
+const loggedIn= {firstName:'Benaka', lastName:'Hebbar', email:'conatct@gmail.com'}
+
   return (
    <section className="home">
     <div className="home-content">
-    <header className="">
-      <h1 className="text-success-600 text-xl">Welcome to the app</h1>  
-      Welcome,Adrian
+    <header className="home-header">
+      <HeaderBox
+       type='greeting'
+       title='Welcome'
+       user={loggedIn?.firstName||'Guest'}
+       subtext='Acess and manage your acoount and transactions efficiently.'
+      />
+      <TotalBalanceBox
+       accounts={[]}
+       totalBanks={1}
+       totalCurrentBalance={1250.35}
+      />
     </header>
+     RECENT TRANSACTIONS
     </div>
+    <RightSidebar 
+     user={loggedIn}
+     transactions={[]}
+     banks={[{currentBalance:123.50},{currentBalance:500.50}]}
+    />
+
+
    </section>
 
   );
