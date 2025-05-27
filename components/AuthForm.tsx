@@ -2,32 +2,25 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { use, useState } from 'react'
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Divide, Loader2 } from 'lucide-react'
+import {  Loader2 } from 'lucide-react'
 import { authFormSchema } from '@/lib/utils'
 import CustomInput from './CustomInput'
-import { sign } from 'crypto'
+
 import { useRouter } from 'next/navigation'
-import { signIn, signUp } from '@/lib/actions/user.actions'
+import { getLoggedInUser, signIn, signUp } from '@/lib/actions/user.actions'
+import PlaidLink from './PlaidLink'
+import { Form } from './ui/form'
 
 
 const AuthForm = ({type}:{type:string}) => {
     const [user,setUser]=useState(null)
     const [isloading,setLoading]=useState(false)
+   
 
     const formSchema= authFormSchema(type);
     const router = useRouter()
@@ -44,19 +37,33 @@ const AuthForm = ({type}:{type:string}) => {
         setLoading(true)
         try {
           // SIgn up with appwrite and create plain link token
+      
+
           if(type==='sign-up'){
-            const newUser = await signUp(data as SignUpParams)
+            const userData ={
+              firstName:data.firstName!,
+              lastName:data.lastName!,
+              address1:data.address1!,
+              city:data.city!,
+              state:data.state!,
+              postalCode:data.postalCode!,
+              dateOfBirth:data.dateOfBirth!,
+              ssn:data.ssn!,
+              email:data.email,
+              password:data.password,
+            }
+            const newUser = await signUp(userData);
             console.log('New User',newUser)
             setUser(newUser)
         }
           if(type==='sign-in'){
-            // const response= await signIn({
-            //   email: data.email,
-            //   password: data.password
-            // })
-            // if(response){
-            //   router.push('/')
-            // }
+            const response= await signIn({
+              email: data.email,
+              password: data.password
+            })
+            if(response){
+              router.push('/')
+            }
           }
         } catch (error) {
           console.log(error)
@@ -93,7 +100,7 @@ const AuthForm = ({type}:{type:string}) => {
         </header>
         {user? (
             <div className='flex flex-col gap-4'>
-                PlaiedLink</div>):
+                <PlaidLink user={user} variant="primary"/></div>):
             (<> <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {type==='sign-up' && (<>
