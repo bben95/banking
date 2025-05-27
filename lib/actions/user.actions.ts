@@ -13,7 +13,7 @@ import { addFundingSource, createDwollaCustomer } from "./dwolla.actions";
 const {
   APPWRITE_DATABASE_ID:DATABASE_ID,
   APPWRITE_USER_COLLECTION_ID:USER_COLLECTION_ID,
-  APPWRITE_BANK_ACCOUNT_COLLECTION_ID:BANK_COLLECTION_ID,
+  APPWRITE_BANK_COLLECTION_ID:BANK_COLLECTION_ID,
 }=process.env;
 
 export const getUserInfo = async ({ userId }: getUserInfoProps) => {
@@ -149,19 +149,19 @@ export const createBankAccount = async ({
 }:createBankAccountProps) => {
    try {
     const { database } = await createAdminClient();
-    const bankAccount = await database.createDocument(
-      DATABASE_ID!,
-      BANK_COLLECTION_ID!,
-      ID.unique(),
-      {
-        userId,
-        bankId,
-        accountId,
-        accessToken,
-        fundingSourceUrl,
-        shareableId,
-      }
-    )
+      const bankAccount = await database.createDocument(
+        DATABASE_ID!,
+        BANK_COLLECTION_ID!,
+        ID.unique(),
+        {
+          userId,
+          bankId,
+          accountId,
+          accessToken,
+          fundingSourceUrl,
+          shareableId,
+        }
+      )
     return parseStringify(bankAccount);
    } catch (error) {
     console.log('Error creating bank account', error);
@@ -179,7 +179,7 @@ export const createBankAccount = async ({
       const accountData = accountResponse.data.accounts[0];
       const request: ProcessorTokenCreateRequest ={
         access_token: accessToken,
-        account_id: user.$id,
+        account_id: accountData.account_id,
         processor: "dwolla" as ProcessorTokenCreateRequestProcessorEnum,
       }
       const processorTokenResponse = await plaidClient.processorTokenCreate(request);
