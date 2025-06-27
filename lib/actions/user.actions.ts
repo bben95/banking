@@ -108,6 +108,7 @@ export async function getLoggedInUser() {
       const user = await getUserInfo({userId:result.$id})
       return parseStringify(user);
     } catch (error) {
+      console.error('Error fetching logged in user:', error);
       return null;
     }
   }
@@ -119,6 +120,7 @@ export async function getLoggedInUser() {
     await account.deleteSession('current');
     }
    catch (error) {
+    console.error('Error logging out:', error);
     return null;
   }
   }
