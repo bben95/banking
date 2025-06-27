@@ -1,13 +1,25 @@
 import HeaderBox from "@/components/HeaderBox";
+import RecentTransactions from "@/components/RecentTransactions";
 import RightSidebar from "@/components/RightSidebar";
 import TotalBalanceBox from "@/components/TotalBalanceBox";
+import { getAccount, getAccounts } from "@/lib/actions/bank.actions";
 import { getLoggedInUser } from "@/lib/actions/user.actions";
 import { console } from "inspector";
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ id?: string; page?: string }> }) {
+  const { id, page } = await searchParams;
+const currentPage=Number(page as string)|| 1
 const loggedIn= await getLoggedInUser();
+const accounts= await getAccounts({userId:loggedIn.$id})
 
-console.log('Logged In User', loggedIn);
+
+if(!accounts) return;
+
+const accountsData = accounts?.data;
+const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId;
+
+
+const account = await getAccount({ appwriteItemId })
 
   return (
    <section className="home">
@@ -16,21 +28,26 @@ console.log('Logged In User', loggedIn);
       <HeaderBox
        type='greeting'
        title='Welcome'
-       user={loggedIn?.name||'Guest'}
+       user={loggedIn?.firstName||'Guest'}
        subtext='Acess and manage your acoount and transactions efficiently.'
       />
       <TotalBalanceBox
-       accounts={[]}
-       totalBanks={1}
-       totalCurrentBalance={1250.35}
+       accounts={accountsData}
+       totalBanks={accounts?.totalBanks}
+       totalCurrentBalance={accounts?.totalCurrentBalance}
       />
     </header>
-     RECENT TRANSACTIONS
+     <RecentTransactions 
+     accounts={accountsData} 
+     transactions={account?.transactions} 
+     appwriteItemId={appwriteItemId}
+     page={currentPage}
+     />
     </div>
     <RightSidebar 
      user={loggedIn}
-     transactions={[]}
-     banks={[{currentBalance:123.50},{currentBalance:500.50}]}
+     transactions={account?.transactions}
+     banks={accountsData?.slice(0,3)}
     />
 
 
