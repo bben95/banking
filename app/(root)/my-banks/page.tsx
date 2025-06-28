@@ -3,9 +3,15 @@ import HeaderBox from '@/components/HeaderBox'
 import { getAccounts } from '@/lib/actions/bank.actions';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import React from 'react'
+import { redirect } from 'next/navigation';
 
 const MyBanks = async () => {
   const loggedIn = await getLoggedInUser();
+
+    if (!loggedIn || !loggedIn.$id) {
+      redirect('/sign-in');
+    }
+
   const accounts = await getAccounts({ userId: loggedIn.$id })
   return (
     <section className='flex'>

@@ -3,10 +3,15 @@ import PaymentTransferForm from '@/components/PaymentTransferForm'
 import { getAccounts } from '@/lib/actions/bank.actions';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import React from 'react'
+import { redirect } from 'next/navigation';
 
 const Transfer = async () => {
 
   const loggedIn = await getLoggedInUser();
+  
+  if (!loggedIn || !loggedIn.$id) {
+    redirect('/sign-in');
+  }
   const accounts = await getAccounts({ userId: loggedIn.$id })
 
 

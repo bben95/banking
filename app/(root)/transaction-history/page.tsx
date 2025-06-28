@@ -5,11 +5,15 @@ import { getAccount, getAccounts } from '@/lib/actions/bank.actions';
 import { getLoggedInUser } from '@/lib/actions/user.actions';
 import { formatAmount } from '@/lib/utils';
 import React from 'react'
+import { redirect } from 'next/navigation';
 
 const TransactionHistory = async ({ searchParams }: { searchParams: Promise<{ id?: string; page?: string }> }) => {
   const { id, page } = await searchParams;
   const currentPage = Number(page as string) || 1
   const loggedIn = await getLoggedInUser();
+    if (!loggedIn || !loggedIn.$id) {
+      redirect('/sign-in');
+    }
   const accounts = await getAccounts({ userId: loggedIn.$id })
 
   if (!accounts) return;
